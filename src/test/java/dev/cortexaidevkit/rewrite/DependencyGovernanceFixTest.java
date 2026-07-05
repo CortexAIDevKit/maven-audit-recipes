@@ -1,6 +1,5 @@
 package dev.cortexaidevkit.rewrite;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
@@ -20,11 +19,14 @@ class DependencyGovernanceFixTest implements RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.recipeFromResources("dev.cortexaidevkit.DependencyGovernanceFix");
+        // Load the declarative recipe from its specific YAML rather than scanning the whole runtime
+        // classpath: scanRuntimeClasspath() (used by recipeFromResources) is a parallel scan whose
+        // races can intermittently fail to link a declarative recipe that references other recipes.
+        spec.recipeFromResource("/META-INF/rewrite/audit.yml", "dev.cortexaidevkit.DependencyGovernanceFix");
     }
 
     private static final String POM =
-            "<project>\n" +
+        "<project>\n" +
             "  <modelVersion>4.0.0</modelVersion>\n" +
             "  <groupId>com.example</groupId>\n" +
             "  <artifactId>demo</artifactId>\n" +
@@ -50,16 +52,16 @@ class DependencyGovernanceFixTest implements RewriteTest {
     @Test
     void removesRedundantExplicitVersion() {
         rewriteRun(
-                pomXml(POM, spec -> spec.after(actual -> {
-                    // Version 2.15.1 appears twice before (dependencyManagement + dependency);
-                    // the redundant one on the <dependency> is removed, leaving exactly one.
-                    assertThat(countOccurrences(actual, "2.15.1")).isEqualTo(1);
-                    return actual;
-                })),
-                text(null, spec -> spec.path("DEPENDENCY-GOVERNANCE.md").after(actual -> {
-                    assertThat(actual).contains("Dependency Governance Report");
-                    return actual;
-                }))
+            pomXml(POM, spec -> spec.after(actual -> {
+                // Version 2.15.1 appears twice before (dependencyManagement + dependency);
+                // the redundant one on the <dependency> is removed, leaving exactly one.
+                assertThat(countOccurrences(actual, "2.15.1")).isEqualTo(1);
+                return actual;
+            })),
+            text(null, spec -> spec.path("DEPENDENCY-GOVERNANCE.md").after(actual -> {
+                assertThat(actual).contains("Dependency Governance Report");
+                return actual;
+            }))
         );
     }
 
