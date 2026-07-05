@@ -58,7 +58,7 @@ class DependencyGovernanceFixTest implements RewriteTest {
                 assertThat(countOccurrences(actual, "2.15.1")).isEqualTo(1);
                 return actual;
             })),
-            text(null, spec -> spec.path("DEPENDENCY-GOVERNANCE.md").after(actual -> {
+            text(null, spec -> spec.path("target/rewrite/maven-audit-recipes/DEPENDENCY-GOVERNANCE.md").after(actual -> {
                 assertThat(actual).contains("Dependency Governance Report");
                 return actual;
             }))

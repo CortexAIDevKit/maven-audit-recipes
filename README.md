@@ -32,8 +32,8 @@ For every resolved dependency (direct and transitive) the report captures:
 Running the recipe produces two things:
 
 1. **Data table (CSV)** — under `target/rewrite/datatables/…` when `exportDatatables` is enabled.
-2. **`DEPENDENCY-GOVERNANCE.md`** — a generated markdown table at the repository root, regenerated
-   idempotently on each run.
+2. **`target/rewrite/maven-audit-recipes/DEPENDENCY-GOVERNANCE.md`** — a generated markdown table,
+   regenerated on each run alongside the build outputs.
 
 ## Recipes
 
