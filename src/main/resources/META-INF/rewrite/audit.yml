@@ -1,0 +1,27 @@
+#
+# Declarative recipes that compose the dependency governance report with an optional fixer.
+#
+# Run with:
+#   mvn org.openrewrite.maven:rewrite-maven-plugin:run \
+#       -Drewrite.activeRecipes=dev.cortexaidevkit.DependencyGovernanceAudit
+#
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: dev.cortexaidevkit.DependencyGovernanceAudit
+displayName: Dependency governance audit (report only)
+description: >-
+  Read-only audit. Emits the dependency governance data table and generates a
+  DEPENDENCY-GOVERNANCE.md summary. Does not modify any POM.
+recipeList:
+  - dev.cortexaidevkit.rewrite.DependencyGovernanceReport
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: dev.cortexaidevkit.DependencyGovernanceFix
+displayName: Dependency governance audit and fix
+description: >-
+  Runs the governance report, then removes explicit <version> tags whose value exactly
+  matches the version already supplied by dependencyManagement or an imported BOM.
+recipeList:
+  - dev.cortexaidevkit.rewrite.DependencyGovernanceReport
+  # Reuses OpenRewrite's built-in fixer instead of reimplementing it.
+  - org.openrewrite.maven.RemoveRedundantDependencyVersions
